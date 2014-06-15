@@ -11,21 +11,7 @@ import Data.Text.Encoding (encodeUtf8)
 
 getHomeR :: Handler Html
 getHomeR = do
-    defaultLayout $ do
-        [whamlet|
-            <h1>Paste
-
-            <p>
-                &lt;command&gt; | curl -F 'file=@-' http://paste.gnugen.ch
-
-            <p>
-                Send a POST request to this page with your data in the "file"
-                field name, the entire url uploaded is sent back or a HTTP 302
-                is replied.
-
-            <footer>
-                Coded with Yesod in Haskell.
-        |]
+    defaultLayout $(widgetFile "homepage")
 
 getRawR :: Text -> Handler TypedContent
 getRawR fhash = do
