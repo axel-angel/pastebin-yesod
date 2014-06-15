@@ -66,7 +66,10 @@ widgetFile = (if development then widgetFileReload
               widgetFileSettings
 
 data Extra = Extra
+    { extraUploadDir :: Text
+    }
     deriving Show
 
 parseExtra :: DefaultEnv -> Object -> Parser Extra
-parseExtra _ _o = pure Extra
+parseExtra _ o = pure Extra
+    <*> o .:  "uploadDir"

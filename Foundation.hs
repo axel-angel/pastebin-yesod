@@ -14,6 +14,7 @@ import qualified Database.Persist
 import Database.Persist.Sql (SqlPersistT)
 import Settings (widgetFile, Extra (..))
 import Model
+import Data.Text (Text)
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
@@ -103,6 +104,9 @@ instance Yesod App where
         development || level == LevelWarn || level == LevelError
 
     makeLogger = return . appLogger
+
+    -- | Maximum allowed length of the request body, in bytes.
+    maximumContentLength _ _ = Just $ 1024 * 1024 * 1024 -- 1 Go
 
 -- How to run database actions.
 instance YesodPersist App where
