@@ -11,6 +11,7 @@ import Data.Text.Encoding (encodeUtf8)
 
 getHomeR :: Handler Html
 getHomeR = do
+    siteUrl <- extraApproot <$> getExtra
     defaultLayout $(widgetFile "homepage")
 
 getRawR :: Text -> Handler TypedContent

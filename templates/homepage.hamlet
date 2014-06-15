@@ -1,8 +1,8 @@
-<h1>GNUGen Paste
+<h1>Paste
 
 <h2>Usage:
 <pre>
-    &lt;command&gt; | curl -F 'file=@-' -H 'Expect:' http://paste.gnugen.ch
+    &lt;command&gt; | curl -F 'file=@-' -H 'Expect:' #{siteUrl}
 
 <h2>Features:
 <ul>
@@ -23,8 +23,8 @@
     directly (2nd below) so it can find the type itself (look at man curl).
 
 <pre>
-    curl -F 'file=@/path/to/file' -H 'Expect:' http://paste.gnugen.ch
-    &lt;command&gt; | curl -F 'file=@-;type=image/jpeg' -H 'Expect:' http://paste.gnugen.ch
+    curl -F 'file=@/path/to/file' -H 'Expect:' #{siteUrl}
+    &lt;command&gt; | curl -F 'file=@-;type=image/jpeg' -H 'Expect:' #{siteUrl}
 
 
 <p>
