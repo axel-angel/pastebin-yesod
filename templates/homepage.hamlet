@@ -7,6 +7,7 @@
 <h2>Features:
 <ul>
     <li>Supports binary files
+    <li>Keeps the Content-Type (2nd and 3rd commands)
     <li>Very easy to use
 
 <h2>Details
@@ -16,7 +17,18 @@
     is replied.
 
 <p>
-    If you are wondering about this Expect, this is a HTTP header
+    <b>Content-Type</b>: It allows the browser or client to infer types of files
+    to correctly display them. cURL cannot infer the type of piped input so you
+    could explicitly give the content type (1st below) or pass it the file
+    directly (2nd below) so it can find the type itself (look at man curl).
+
+<pre>
+    curl -F 'file=@/path/to/file' -H 'Expect:' http://paste.gnugen.ch
+    &lt;command&gt; | curl -F 'file=@-;type=image/jpeg' -H 'Expect:' http://paste.gnugen.ch
+
+
+<p>
+    <b>Expect</b>: If you are wondering about this Expect, this is a HTTP header
     that our server does not support, so we say cURL not to send
     it and it just works as expected :)
 
