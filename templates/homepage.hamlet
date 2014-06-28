@@ -39,5 +39,9 @@
     that our server does not support, so we say cURL not to send
     it and it just works as expected :)
 
+<small>
+    There is no guarantee of serivces of any kind.
+    Note your IP address is stored for security reasons.
+
 <footer>
-    Coded with Yesod in Haskell by Axel Angel for GNU Generation.
+    Coded with <a href="http://www.yesodweb.com/">Yesod</a> in Haskell by Axel Angel for GNU Generation, 2014.
