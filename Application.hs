@@ -70,18 +70,7 @@ makeFoundation conf = do
     loggerSet' <- newStdoutLoggerSet defaultBufSize
     (getter, updater) <- clockDateCacher
 
-    -- If the Yesod logger (as opposed to the request logger middleware) is
-    -- used less than once a second on average, you may prefer to omit this
-    -- thread and use "(updater >> getter)" in place of "getter" below.  That
-    -- would update the cache every time it is used, instead of every second.
-    let updateLoop = do
-            threadDelay 1000000
-            updater
-            flushLogStr loggerSet'
-            updateLoop
-    _ <- forkIO updateLoop
-
-    let logger = Yesod.Core.Types.Logger loggerSet' getter
+    let logger = Yesod.Core.Types.Logger loggerSet' $ updater >> getter
         foundation = App conf s p manager dbconf logger
 
     -- Perform database migration using our application's logging settings.
