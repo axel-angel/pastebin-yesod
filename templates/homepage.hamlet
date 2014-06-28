@@ -6,16 +6,21 @@
 
 <h2>Features:
 <ul>
+    <li>Very easy to use
     <li>Supports binary files
     <li>Keeps the Content-Type
-    <li>Store filenames, sent as Content-Disposition
-    <li>Very easy to use
+    <li>Preserves filenames, sent as Content-Disposition
+    <li>Optional expiration (self-destruct)
 
 <h2>Details
 <p>
-    Send a POST request to this page with your data in the "file"
+    <b>File</b>: Send a POST request to this page with your data in the "file"
     field name, the entire url uploaded is sent back or a HTTP 302
     is replied.
+
+<p>
+    <b>Expiration</b>: One can specify the number of seconds after which the
+    file should be deleted, use the "expire" field.
 
 <p>
     <b>Content-Type</b>: It allows the browser or client to infer types of files
@@ -29,10 +34,11 @@
     cURL takes the filename of the path or you can provide it separately (see
     below).
 
+<h2>Examples
 <pre>
     curl -F 'file=@/path/to/file' -H 'Expect:' #{siteUrl}
     &lt;command&gt; | curl -F 'file=@-;type=image/jpeg;filename=myphoto.jpg' -H 'Expect:' #{siteUrl}
-
+    &lt;command&gt; | curl -F 'file=@-' -F 'expire=600' -H 'Expect:' #{siteUrl}
 
 <p>
     <b>Expect</b>: If you are wondering about this Expect, this is a HTTP header
