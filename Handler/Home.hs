@@ -8,6 +8,7 @@ import Data.ByteString.Lazy (readFile)
 import System.Posix.Files (fileSize, getFileStatus)
 import Data.Time.Clock (getCurrentTime)
 import Data.Text.Encoding (encodeUtf8)
+import Network.Wai (remoteHost)
 import qualified Data.Text as T (replace)
 
 getHomeR :: Handler Html
@@ -40,6 +41,7 @@ saveUpload :: FileInfo -> Handler Text
 saveUpload file = do
     uploadDir <- extraUploadDir <$> getExtra
     hash <- mkPasteHash
+    cAddr <- getRequest >>= return . pack . show . remoteHost . reqWaiRequest
 
     let fullPath = unpack uploadDir </> hash
     liftIO $ fileMove file fullPath
@@ -53,6 +55,7 @@ saveUpload file = do
         , pasteSize = size
         , pasteType = fileContentType file
         , pasteDate = now
+        , pasteAddr = cAddr
         }
     return $ pack hash
 

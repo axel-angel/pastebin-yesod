@@ -11,6 +11,7 @@ Paste
     size Int64
     type Text
     date UTCTime
+    addr Text
         UniqueHash hash
         UniquePath path
         deriving Show Read Eq
