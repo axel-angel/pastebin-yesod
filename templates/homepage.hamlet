@@ -7,7 +7,8 @@
 <h2>Features:
 <ul>
     <li>Supports binary files
-    <li>Keeps the Content-Type (2nd and 3rd commands)
+    <li>Keeps the Content-Type
+    <li>Store filenames, sent as Content-Disposition
     <li>Very easy to use
 
 <h2>Details
@@ -22,9 +23,15 @@
     could explicitly give the content type (1st below) or pass it the file
     directly (2nd below) so it can find the type itself (look at man curl).
 
+<p>
+    <b>Content-Disposition</b>: It allows to suggest a filename to the browser.
+    That means we can store filenames we received and provide them afterward.
+    cURL takes the filename of the path or you can provide it separately (see
+    below).
+
 <pre>
     curl -F 'file=@/path/to/file' -H 'Expect:' #{siteUrl}
-    &lt;command&gt; | curl -F 'file=@-;type=image/jpeg' -H 'Expect:' #{siteUrl}
+    &lt;command&gt; | curl -F 'file=@-;type=image/jpeg;filename=myphoto.jpg' -H 'Expect:' #{siteUrl}
 
 
 <p>
