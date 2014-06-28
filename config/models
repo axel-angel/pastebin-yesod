@@ -7,6 +7,7 @@ User
 Paste
     hash Text
     path Text
+    name Text
     size Int64
     type Text
     date UTCTime

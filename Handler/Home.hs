@@ -8,6 +8,7 @@ import Data.ByteString.Lazy (readFile)
 import System.Posix.Files (fileSize, getFileStatus)
 import Data.Time.Clock (getCurrentTime)
 import Data.Text.Encoding (encodeUtf8)
+import qualified Data.Text as T (replace)
 
 getHomeR :: Handler Html
 getHomeR = do
@@ -19,6 +20,8 @@ getRawR fhash = do
     Entity _ p <- runDB . getBy404 $ UniqueHash fhash
     let cType = encodeUtf8 $ pasteType p
     lbytes <- liftIO $ readFile $ unpack $ pastePath p
+    let fnEsc = T.replace "\"" "\\\"" $ pasteName p
+    addHeader "Content-Disposition" ("attachment; filename=\""<> fnEsc <>"\"")
 
     return $ TypedContent cType $ toContent lbytes
 
@@ -46,6 +49,7 @@ saveUpload file = do
     void . runDB . insert $ Paste
         { pasteHash = pack hash
         , pastePath = pack fullPath
+        , pasteName = fileName file
         , pasteSize = size
         , pasteType = fileContentType file
         , pasteDate = now
