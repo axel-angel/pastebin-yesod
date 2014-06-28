@@ -23,7 +23,7 @@ getRawR fhash = do
     let cType = encodeUtf8 $ pasteType p
     lbytes <- liftIO $ readFile $ unpack $ pastePath p
     let fnEsc = T.replace "\"" "\\\"" $ pasteName p
-    addHeader "Content-Disposition" ("attachment; filename=\""<> fnEsc <>"\"")
+    addHeader "Content-Disposition" ("filename=\""<> fnEsc <>"\"")
 
     return $ TypedContent cType $ toContent lbytes
 
