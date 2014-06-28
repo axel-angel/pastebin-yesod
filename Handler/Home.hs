@@ -6,7 +6,7 @@ import System.FilePath ((</>))
 import System.Random (randomRIO)
 import Data.ByteString.Lazy (readFile)
 import System.Posix.Files (fileSize, getFileStatus)
-import Data.Time.Clock (getCurrentTime)
+import Data.Time.Clock (getCurrentTime, addUTCTime)
 import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import Network.Wai (remoteHost, requestHeaders)
 import Data.Maybe (fromMaybe)
@@ -32,17 +32,20 @@ getRawR fhash = do
 
 postHomeR :: Handler Text
 postHomeR = do
-    res <- runInputPostResult $ ireq fileField "file"
+    -- Takes a file and optionally the seconds after we delete it
+    res <- runInputPostResult $ (,)
+            <$> ireq fileField "file"
+            <*> iopt intField "expire"
     ur <- getUrlRender
     case res of
-         FormSuccess f -> do
-             hash <- saveUpload f
+         FormSuccess (file, mDueIn) -> do
+             hash <- saveUpload file mDueIn
              httpCodeText status200 $ (ur $ RawR hash) <> "\n"
          _ -> do
              httpCodeText status400 "Invalid input"
 
-saveUpload :: FileInfo -> Handler Text
-saveUpload file = do
+saveUpload :: FileInfo -> Maybe Int -> Handler Text
+saveUpload file mDueIn = do
     uploadDir <- extraUploadDir <$> getExtra
     hash <- mkPasteHash
 
@@ -62,7 +65,7 @@ saveUpload file = do
         , pasteSize = size
         , pasteType = fileContentType file
         , pasteDate = now
-        , pasteDueAt = Nothing -- FIXME
+        , pasteDueAt = (`addUTCTime` now) . fromIntegral <$> mDueIn
         , pasteAddr = fromMaybe cAddr cProx
         }
     return $ pack hash
