@@ -7,8 +7,9 @@ import System.Random (randomRIO)
 import Data.ByteString.Lazy (readFile)
 import System.Posix.Files (fileSize, getFileStatus)
 import Data.Time.Clock (getCurrentTime)
-import Data.Text.Encoding (encodeUtf8)
-import Network.Wai (remoteHost)
+import Data.Text.Encoding (encodeUtf8, decodeUtf8)
+import Network.Wai (remoteHost, requestHeaders)
+import Data.Maybe (fromMaybe)
 import qualified Data.Text as T (replace)
 
 getHomeR :: Handler Html
@@ -41,7 +42,10 @@ saveUpload :: FileInfo -> Handler Text
 saveUpload file = do
     uploadDir <- extraUploadDir <$> getExtra
     hash <- mkPasteHash
-    cAddr <- getRequest >>= return . pack . show . remoteHost . reqWaiRequest
+
+    req <- reqWaiRequest <$> getRequest
+    let cAddr = showText . remoteHost $ req
+    let cProx = decodeUtf8 <$> (lookup "X-Forwarded-For" . requestHeaders $ req)
 
     let fullPath = unpack uploadDir </> hash
     liftIO $ fileMove file fullPath
@@ -55,7 +59,7 @@ saveUpload file = do
         , pasteSize = size
         , pasteType = fileContentType file
         , pasteDate = now
-        , pasteAddr = cAddr
+        , pasteAddr = fromMaybe cAddr cProx
         }
     return $ pack hash
 
@@ -83,3 +87,6 @@ pickElem xs = randomRIO (0, length xs - 1) >>= return . (xs !!)
 
 httpCodeText :: Status -> Text -> Handler a
 httpCodeText code txt = sendResponseStatus code txt
+
+showText :: Show a => a -> Text
+showText = pack . show
