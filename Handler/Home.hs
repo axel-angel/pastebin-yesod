@@ -12,6 +12,8 @@ import Network.Wai (remoteHost, requestHeaders)
 import Data.Maybe (fromMaybe)
 import Database.Persist.Sql (SqlPersistM)
 import qualified Data.Text as T (replace)
+import System.Directory (removeFile)
+import Control.Exception (try)
 
 getHomeR :: Handler Html
 getHomeR = do
@@ -86,9 +88,16 @@ handleExpiration :: SqlPersistM ()
 handleExpiration = do
     now <- liftIO getCurrentTime
     liftIO $ putStrLn $ "Deletion of old pastes: " <> show now
-    ps <- selectList [PasteDueAt !=. Nothing] []
-    forM_ ps $ \p -> when (maybe False (< now) $ pasteDueAt . entityVal $ p) $ do
-        liftIO $ putStrLn $ "Paste expired: " <> show p
+    ps <- filter (maybe False (< now) . pasteDueAt . entityVal)
+            <$> selectList [PasteDueAt !=. Nothing] []
+    pIds <- forM ps $ \(Entity pId p) -> do
+        liftIO . putStrLn $ "Paste expired: " <> show p
+        ret <- liftIO . try . removeFile . unpack $ pastePath p
+        case ret :: Either IOError () of
+             Left e -> liftIO . putStrLn $ "Exception: " <> show e
+             Right _ -> return ()
+        return pId
+    deleteWhere [PasteId <-. pIds]
 
 pasteHashLen :: Int
 pasteHashLen = 4
