@@ -85,7 +85,7 @@ mkPasteHash = do
 
 -- background task: deletion of expired pastes
 expireLoop :: Int -- seconds
-expireLoop = 60
+expireLoop = 1800 -- 30 minutes
 
 handleExpiration :: SqlPersistM ()
 handleExpiration = do
