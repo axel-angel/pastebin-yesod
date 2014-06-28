@@ -10,6 +10,7 @@ import Data.Time.Clock (getCurrentTime)
 import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import Network.Wai (remoteHost, requestHeaders)
 import Data.Maybe (fromMaybe)
+import Database.Persist.Sql (SqlPersistM)
 import qualified Data.Text as T (replace)
 
 getHomeR :: Handler Html
@@ -59,6 +60,7 @@ saveUpload file = do
         , pasteSize = size
         , pasteType = fileContentType file
         , pasteDate = now
+        , pasteDueAt = Nothing -- FIXME
         , pasteAddr = fromMaybe cAddr cProx
         }
     return $ pack hash
@@ -75,6 +77,18 @@ mkPasteHash = do
             case pasteMay of
                  Nothing -> return hash'
                  Just _ -> appendCheck hash'
+
+-- background task: deletion of expired pastes
+expireLoop :: Int -- seconds
+expireLoop = 60
+
+handleExpiration :: SqlPersistM ()
+handleExpiration = do
+    now <- liftIO getCurrentTime
+    liftIO $ putStrLn $ "Deletion of old pastes: " <> show now
+    ps <- selectList [PasteDueAt !=. Nothing] []
+    forM_ ps $ \p -> when (maybe False (< now) $ pasteDueAt . entityVal $ p) $ do
+        liftIO $ putStrLn $ "Paste expired: " <> show p
 
 pasteHashLen :: Int
 pasteHashLen = 4

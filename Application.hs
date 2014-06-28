@@ -16,11 +16,11 @@ import Network.Wai.Middleware.RequestLogger
     )
 import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
 import qualified Database.Persist
-import Database.Persist.Sql (runMigration)
+import Database.Persist.Sql (runMigration, runSqlPersistMPool)
 import Network.HTTP.Client.Conduit (newManager)
 import Control.Monad.Logger (runLoggingT)
 import Control.Concurrent (forkIO, threadDelay)
-import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize, flushLogStr)
+import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
 import Network.Wai.Logger (clockDateCacher)
 import Data.Default (def)
 import Yesod.Core.Types (loggerSet, Logger (Logger))
@@ -77,6 +77,13 @@ makeFoundation conf = do
     runLoggingT
         (Database.Persist.runPool dbconf (runMigration migrateAll) p)
         (messageLoggerSource foundation logger)
+
+    -- Peform background tasks
+    let bgAct = do
+        runSqlPersistMPool handleExpiration p
+        threadDelay $ expireLoop * 1000000
+        bgAct
+    _ <- forkIO bgAct
 
     return foundation
 

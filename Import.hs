@@ -37,4 +37,4 @@ import Network.HTTP.Types as Import
     , status404
     )
 
-import Control.Monad as Import (forM, void)
+import Control.Monad as Import (forM, forM_, void, when)
