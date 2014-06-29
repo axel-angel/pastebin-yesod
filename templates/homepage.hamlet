@@ -19,8 +19,11 @@
     is replied.
 
 <p>
-    <b>Expiration</b>: One can specify the number of seconds after which the
-    file should be deleted, use the "expire" field.
+    <b>Expiration</b>: One can specify the number of minutes after which the
+    file should be deleted. Specified by the "expire" field. Alternatively you
+    can specify the time unit: <b>s</b>(econds), <b>h</b>(ours), <b>d</b>(ays),
+    <b>m</b>(onths).
+    Example: 120 (2 minutes), 2m (2 months).
 
 <p>
     <b>Content-Type</b>: It allows the browser or client to infer types of files
@@ -38,7 +41,7 @@
 <pre>
     curl -F 'file=@/path/to/file' -H 'Expect:' #{siteUrl}
     &lt;command&gt; | curl -F 'file=@-;type=image/jpeg;filename=myphoto.jpg' -H 'Expect:' #{siteUrl}
-    &lt;command&gt; | curl -F 'file=@-' -F 'expire=600' -H 'Expect:' #{siteUrl}
+    &lt;command&gt; | curl -F 'file=@-' -F 'expire=1d' -H 'Expect:' #{siteUrl}
 
 <p>
     <b>Expect</b>: If you are wondering about this Expect, this is a HTTP header
@@ -46,7 +49,7 @@
     it and it just works as expected :)
 
 <small>
-    There is no guarantee of serivces of any kind.
+    There is no guarantee of services of any kind.
     Note your IP address is stored for security reasons.
 
 <footer>
