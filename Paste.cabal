@@ -73,6 +73,7 @@ library
                  , time                          >= 1.4
                  , unix                          >= 2.5.1.0
                  , wai                           >= 3.0.0
+                 , regex-compat                  >= 0.95
 
 executable         Paste
     if flag(library-only)

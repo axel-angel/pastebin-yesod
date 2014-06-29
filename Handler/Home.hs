@@ -14,6 +14,7 @@ import Database.Persist.Sql (SqlPersistM)
 import qualified Data.Text as T (replace)
 import System.Directory (removeFile)
 import Control.Exception (try)
+import Text.Regex (mkRegex, matchRegex)
 
 getHomeR :: Handler Html
 getHomeR = do
@@ -35,7 +36,7 @@ postHomeR = do
     -- Takes a file and optionally the seconds after we delete it
     res <- runInputPostResult $ (,)
             <$> ireq fileField "file"
-            <*> iopt intField "expire"
+            <*> iopt expireDeltaField "expire"
     ur <- getUrlRender
     case res of
          FormSuccess (file, mDueIn) -> do
@@ -44,7 +45,7 @@ postHomeR = do
          _ -> do
              httpCodeText status400 "Invalid input"
 
-saveUpload :: FileInfo -> Maybe Int -> Handler Text
+saveUpload :: FileInfo -> Maybe Integer -> Handler Text
 saveUpload file mDueIn = do
     uploadDir <- extraUploadDir <$> getExtra
     hash <- mkPasteHash
@@ -82,6 +83,25 @@ mkPasteHash = do
             case pasteMay of
                  Nothing -> return hash'
                  Just _ -> appendCheck hash'
+
+-- field for time with suffixed unit: X or XY
+-- where X is a positive integer
+--       Y is a unit: s(econds), h(ours), d(ays), m(onths), default to minutes
+expireDeltaField :: Field Handler Integer
+expireDeltaField = checkMMap parse unparse textField
+    where
+        unparse i = showText i <> "s"
+        parse t = return $ case matchRegex reg (unpack t) of
+                       Just (i:"":_) -> Right (read i * 60)
+                       Just (i:u:_)  -> Right (read i * mUnit u)
+                       _ -> Left ("Invalid expiration format" :: Text)
+
+        mUnit "s" = 1              -- second
+        mUnit "h" = 3600           -- hour
+        mUnit "d" = 3600 * 24      -- day
+        mUnit "m" = 3600 * 24 * 30 -- month
+        mUnit  _  = 60 -- (should never happen)
+        reg = mkRegex "^([0-9]+)([shdm])?$"
 
 -- background task: deletion of expired pastes
 expireLoop :: Int -- seconds
