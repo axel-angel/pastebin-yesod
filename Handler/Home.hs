@@ -86,7 +86,8 @@ mkPasteHash = do
 
 -- field for time with suffixed unit: X or XY
 -- where X is a positive integer
---       Y is a unit: s(econds), h(ours), d(ays), m(onths), default to minutes
+--       Y is a unit: s(econds), h(ours), d(ays), w(eeks), m(onths),
+--       default to minutes
 expireDeltaField :: Field Handler Integer
 expireDeltaField = checkMMap parse unparse textField
     where
@@ -99,9 +100,10 @@ expireDeltaField = checkMMap parse unparse textField
         mUnit "s" = 1              -- second
         mUnit "h" = 3600           -- hour
         mUnit "d" = 3600 * 24      -- day
+        mUnit "w" = 3600 * 24 * 7  -- week
         mUnit "m" = 3600 * 24 * 30 -- month
         mUnit  _  = 60 -- (should never happen)
-        reg = mkRegex "^([0-9]+)([shdm])?$"
+        reg = mkRegex "^([0-9]+)([shdwm])?$"
 
 -- background task: deletion of expired pastes
 expireLoop :: Int -- seconds

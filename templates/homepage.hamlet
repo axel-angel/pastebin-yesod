@@ -22,7 +22,7 @@
     <b>Expiration</b>: One can specify the number of minutes after which the
     file should be deleted. Specified by the "expire" field. Alternatively you
     can specify the time unit: <b>s</b>(econds), <b>h</b>(ours), <b>d</b>(ays),
-    <b>m</b>(onths).
+    <b>w</b>(eeks), <b>m</b>(onths).
     Example: 120 (2 minutes), 2m (2 months).
 
 <p>

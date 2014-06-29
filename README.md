@@ -24,9 +24,8 @@ replied.
 
 **Expiration**: One can specify the number of minutes after which the
 file should be deleted. Specified by the "expire" field. Alternatively
-you can specify the amount of time, supported units: **s**(econds),
-**h**(ours), **d**(ays), **m**(onths). Example: 120 (2 minutes), 2m (2
-months).
+you can specify the time unit: **s**(econds), **h**(ours), **d**(ays),
+**w**(eeks), **m**(onths). Example: 120 (2 minutes), 2m (2 months).
 
 **Content-Type**: It allows the browser or client to infer types of
 files to correctly display them. cURL cannot infer the type of piped
